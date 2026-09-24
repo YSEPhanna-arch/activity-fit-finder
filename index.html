@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Activity Fit Finder</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --text:#18202a; --muted:#667085; --border:#d9dee7; --accent:#3559e0; --good:#16794b; --warn:#a15c00; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:var(--bg); color:var(--text); }
+  .wrap { max-width:1050px; margin:0 auto; padding:32px 20px 60px; }
+  header { margin-bottom:24px; }
+  h1 { margin:0 0 8px; font-size:32px; }
+  h2 { margin:0 0 14px; font-size:20px; }
+  p { line-height:1.5; }
+  .sub { color:var(--muted); margin:0; max-width:720px; }
+  .layout { display:grid; grid-template-columns:340px 1fr; gap:20px; align-items:start; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:20px; }
+  .filters { position:sticky; top:16px; }
+  .field { margin-bottom:18px; }
+  label.legend { display:block; font-weight:650; margin-bottom:8px; }
+  input[type=number], select { width:100%; padding:11px 12px; border:1px solid var(--border); border-radius:10px; background:white; font:inherit; font-size:16px; }
+  .checks { display:grid; gap:8px; }
+  .check { display:flex; gap:9px; align-items:flex-start; color:#303846; line-height:1.35; }
+  .check input { margin-top:4px; width:18px; height:18px; }
+  .actions { display:flex; gap:9px; margin-top:8px; }
+  button { border:0; border-radius:10px; padding:12px 15px; font:inherit; font-weight:650; cursor:pointer; }
+  .primary { background:var(--accent); color:white; flex:1; }
+  .secondary { background:#eef1f5; color:#273142; }
+  .summary { display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom:14px; }
+  .count { color:var(--muted); font-size:14px; }
+  .results { display:grid; gap:12px; }
+  .activity { border:1px solid var(--border); border-radius:14px; padding:17px; background:#fff; }
+  .activity-top { display:flex; justify-content:space-between; gap:12px; }
+  .activity h3 { margin:0 0 5px; font-size:18px; }
+  .score { white-space:nowrap; font-weight:750; color:var(--good); }
+  .meta { color:var(--muted); font-size:14px; margin:8px 0 12px; }
+  .reason { margin:0 0 10px; }
+  .adapt { padding:11px 12px; border-radius:10px; background:#f4f6fa; font-size:14px; }
+  .adapt strong { display:block; margin-bottom:3px; }
+  .tag { display:inline-block; border:1px solid var(--border); border-radius:999px; padding:4px 8px; margin:3px 4px 0 0; font-size:12px; color:#46505f; background:#fafbfc; }
+  .empty { color:var(--muted); padding:28px 8px; text-align:center; }
+  .notice { margin-top:12px; color:var(--warn); font-size:13px; }
+  @media(max-width:800px){ .layout{grid-template-columns:1fr;} .filters{position:static;} h1{font-size:27px;} }
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <header>
+    <h1>Activity Fit Finder</h1>
+    <p class="sub">Describe your group and available resources. The prototype ranks activities by fit and explains useful adaptations.</p>
+  </header>
+
+  <div class="layout">
+    <section class="card filters" aria-label="Group requirements">
+      <h2>Your group</h2>
+
+      <div class="field">
+        <label class="legend" for="participants">Participants</label>
+        <input id="participants" type="number" min="1" max="500" value="12">
+      </div>
+
+      <div class="field">
+        <label class="legend" for="age">Age group</label>
+        <select id="age">
+          <option value="mixed">Mixed</option><option value="children">Children</option>
+          <option value="teens">Teenagers</option><option value="adults">Adults</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="legend">Accessibility considerations</label>
+        <div class="checks">
+          <label class="check"><input type="checkbox" value="mobility" class="access"> Limited mobility / wheelchair user</label>
+          <label class="check"><input type="checkbox" value="vision" class="access"> Visual impairment</label>
+          <label class="check"><input type="checkbox" value="hearing" class="access"> Hearing impairment</label>
+          <label class="check"><input type="checkbox" value="upper" class="access"> Limited upper-body movement</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="legend" for="place">Location</label>
+        <select id="place">
+          <option value="either">Indoor or outdoor</option><option value="indoor">Indoor</option><option value="outdoor">Outdoor</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="legend" for="space">Available space</label>
+        <select id="space">
+          <option value="any">Any</option><option value="small">Small room</option><option value="medium">Hall / classroom</option><option value="large">Large field / court</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="legend">Equipment available</label>
+        <div class="checks">
+          <label class="check"><input type="checkbox" value="none" class="equip" checked> No specialist equipment</label>
+          <label class="check"><input type="checkbox" value="balls" class="equip"> Balls</label>
+          <label class="check"><input type="checkbox" value="cones" class="equip"> Cones / markers</label>
+          <label class="check"><input type="checkbox" value="paper" class="equip"> Paper / pens</label>
+          <label class="check"><input type="checkbox" value="music" class="equip"> Music / speaker</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="legend" for="duration">Time available</label>
+        <select id="duration">
+          <option value="10">10 minutes</option><option value="20" selected>20 minutes</option>
+          <option value="30">30 minutes</option><option value="60">60+ minutes</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="legend" for="purpose">Purpose</label>
+        <select id="purpose">
+          <option value="fun">Fun / energiser</option><option value="icebreaker">Icebreaker</option>
+          <option value="team">Team-building</option><option value="exercise">Physical activity</option>
+          <option value="calm">Calm / reflective</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="legend" for="intensity">Intensity</label>
+        <select id="intensity">
+          <option value="low">Low</option><option value="moderate" selected>Moderate</option><option value="high">High</option>
+        </select>
+      </div>
+
+      <div class="actions">
+        <button class="primary" id="find">Find activities</button>
+        <button class="secondary" id="reset" type="button">Reset</button>
+      </div>
+      <div class="notice" id="notice" aria-live="polite"></div>
+    </section>
+
+    <section>
+      <div class="card">
+        <div class="summary">
+          <div><h2>Suggested activities</h2><div class="count" id="count"></div></div>
+        </div>
+        <div class="results" id="results" aria-live="polite"></div>
+      </div>
+      <div class="card" style="margin-top:20px">
+        <h2>Activity library</h2>
+        <p class="sub" style="margin-bottom:14px">Add your own games with descriptions, step-by-step instructions, accessibility adaptations, photos and demonstration videos. You can paste a media URL or select a local file.</p>
+        <button class="primary" id="addActivity" type="button">＋ Add an activity</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+(() => {
+  const activities = [
+    {name:"Human Bingo", min:6,max:40,ages:["children","teens","adults","mixed"],places:["indoor","outdoor"],space:"medium",equip:["paper","none"],duration:[15,30],purpose:["icebreaker","fun"],intensity:"low",access:["mobility","vision","hearing","upper"],reason:"Works well for mixed groups, needs little movement and encourages people to interact.",adapt:"Offer seated participation, read prompts aloud, and provide large-print or paired support where useful."},
+    {name:"Story Chain", min:3,max:20,ages:["children","teens","adults","mixed"],places:["indoor","outdoor"],space:"small",equip:["none"],duration:[10,20],purpose:["icebreaker","team","calm"],intensity:"low",access:["mobility","vision","hearing","upper"],reason:"Everyone can contribute from one place, making it easy to scale and adapt.",adapt:"Allow speaking, signing, pointing, writing or assisted communication as appropriate."},
+    {name:"Balloon Volleyball", min:6,max:24,ages:["children","teens","adults","mixed"],places:["indoor","outdoor"],space:"medium",equip:["balls","none"],duration:[15,30],purpose:["fun","team","exercise"],intensity:"moderate",access:["mobility","vision","hearing","upper"],reason:"A light, cooperative movement game that can be played seated or standing.",adapt:"Lower or remove the net, permit seated play, and use an audible or high-contrast ball when needed."},
+    {name:"Target Toss", min:4,max:16,ages:["children","teens","adults","mixed"],places:["indoor","outdoor"],space:"medium",equip:["balls","cones","none"],duration:[15,30],purpose:["fun","exercise"],intensity:"moderate",access:["mobility","hearing","upper"],reason:"Simple turns make participation easy to structure and the target distance can be adjusted.",adapt:"Use seated throwing, roll instead of throw, enlarge targets, or reduce the distance."},
+    {name:"Mirror Movements", min:2,max:20,ages:["children","teens","adults","mixed"],places:["indoor","outdoor"],space:"small",equip:["none"],duration:[5,20],purpose:["fun","icebreaker","calm"],intensity:"low",access:["mobility","vision","hearing","upper"],reason:"Pairs can work within a small area and choose movements that suit their abilities.",adapt:"Use upper-body, facial or finger movements, and demonstrate rather than relying on verbal instructions."},
+    {name:"Team Shape Challenge", min:6,max:30,ages:["children","teens","adults","mixed"],places:["indoor","outdoor"],space:"medium",equip:["none","cones"],duration:[10,30],purpose:["team","fun"],intensity:"moderate",access:["mobility","hearing","upper"],reason:"Teams solve a visual/physical challenge without requiring running.",adapt:"Let participants direct others, form shapes while seated, and use visual instructions."},
+    {name:"Musical Freeze", min:5,max:30,ages:["children","teens","adults","mixed"],places:["indoor","outdoor"],space:"medium",equip:["music","none"],duration:[10,30],purpose:["fun","exercise"],intensity:"moderate",access:["mobility","hearing","upper"],reason:"Flexible movement makes it easy to scale the physical demand.",adapt:"Use visual stop signals for deaf/hard-of-hearing participants and allow seated movement."},
+    {name:"Nature Scavenger Hunt", min:4,max:30,ages:["children","teens","adults","mixed"],places:["outdoor"],space:"large",equip:["paper","none"],duration:[20,60],purpose:["fun","team","exercise"],intensity:"moderate",access:["hearing","upper"],reason:"Can combine exploration with teamwork and observation.",adapt:"Choose an accessible route, provide picture-based lists, and allow stationary observation roles."},
+    {name:"Cooperative Puzzle Relay", min:6,max:24,ages:["children","teens","adults","mixed"],places:["indoor"],space:"medium",equip:["paper","none"],duration:[20,60],purpose:["team","fun"],intensity:"low",access:["mobility","vision","hearing","upper"],reason:"Team members can take different roles, so physical participation is not the only way to contribute.",adapt:"Use tactile or large-print pieces and allow seated team roles."},
+    {name:"Pass the Clap", min:5,max:30,ages:["children","teens","adults","mixed"],places:["indoor","outdoor"],space:"small",equip:["none"],duration:[5,15],purpose:["icebreaker","fun"],intensity:"low",access:["mobility","hearing","upper"],reason:"Very little space or equipment is required and the pace can be adjusted.",adapt:"Replace sound with a visible hand signal or light tap; participants can pass a visual gesture instead."}
+  ];
+
+
+  const richer = {
+    "Human Bingo": {description:"A social bingo game where participants find people who match prompts on their cards.",steps:"1. Give everyone a bingo card.\n2. Participants mingle and find people who match each square.\n3. Write names in the squares.\n4. Call time and celebrate completed lines.",adapt:"Offer seated participation, read prompts aloud, and provide large-print cards or paired support."},
+    "Story Chain": {description:"The group creates one shared story, with each person adding a sentence or idea.",steps:"1. Choose a starting sentence.\n2. Move around the group, adding one idea at a time.\n3. Keep the story going until everyone has contributed.\n4. Read the finished story back to the group.",adapt:"Allow speaking, signing, pointing, writing or assisted communication as appropriate."},
+    "Balloon Volleyball": {description:"A cooperative volleyball-style game using a balloon, designed to keep the balloon in play.",steps:"1. Divide the group into two teams.\n2. Put a balloon into play.\n3. Players tap it over a string or imaginary line.\n4. Score when it touches the ground on the other side.\n5. Play several short rounds.",adapt:"Lower or remove the net, permit seated play, and use an audible or high-contrast ball when needed."},
+    "Target Toss": {description:"Players take turns throwing or rolling an object toward a target and can compete individually or in teams.",steps:"1. Place a target on the floor or ground.\n2. Mark a throwing line.\n3. Give each player several attempts.\n4. Award points based on where the object lands.",adapt:"Use seated throwing, rolling instead of throwing, larger targets, or shorter distances."},
+    "Mirror Movements": {description:"Pairs take turns leading and mirroring simple movements.",steps:"1. Pair participants.\n2. One person leads slow movements.\n3. Their partner mirrors them.\n4. Swap leaders after a minute.",adapt:"Use upper-body, facial or finger movements, and demonstrate rather than relying on verbal instructions."},
+    "Team Shape Challenge": {description:"Teams work together to create shapes, letters or objects using their bodies or agreed positions.",steps:"1. Give the team a shape or object to make.\n2. Allow them a short planning period.\n3. Create the shape together.\n4. Reveal and compare the results.",adapt:"Let participants direct others, form shapes while seated, and use visual instructions."},
+    "Musical Freeze": {description:"Participants move to music and freeze when the music stops.",steps:"1. Start music.\n2. Participants move in their own space.\n3. Stop the music and everyone freezes.\n4. Restart and repeat.",adapt:"Use visual stop signals for deaf/hard-of-hearing participants and allow seated movement."},
+    "Nature Scavenger Hunt": {description:"Small teams explore an outdoor area looking for objects, colors, sounds or other items on a list.",steps:"1. Give teams a scavenger list.\n2. Explain the boundaries and safety rules.\n3. Teams search and record what they find.\n4. Return at the agreed time and share discoveries.",adapt:"Choose an accessible route, provide picture-based lists, and allow stationary observation roles."},
+    "Cooperative Puzzle Relay": {description:"Teams solve a sequence of small puzzles or challenges, sharing roles so everyone can contribute.",steps:"1. Prepare several simple puzzles.\n2. Divide the group into teams.\n3. Teams work through the challenges.\n4. Encourage different people to take different roles.",adapt:"Use tactile or large-print pieces and allow seated team roles."},
+    "Pass the Clap": {description:"A quick circle game where a gesture or clap is passed around the group.",steps:"1. Stand or sit in a circle.\n2. One person makes a clap or gesture toward the next person.\n3. Continue around the circle.\n4. Increase the speed or reverse direction.",adapt:"Replace sound with a visible hand signal or light tap; participants can pass a visual gesture instead."}
+  };
+  activities.forEach(a => Object.assign(a, richer[a.name] || {}));
+  const customActivities = [];
+  const $ = id => document.getElementById(id);
+  const read = () => {
+    const p = Math.max(1, Math.min(500, Number($("participants").value) || 1));
+    const access = [...document.querySelectorAll(".access:checked")].map(x=>x.value);
+    const equip = [...document.querySelectorAll(".equip:checked")].map(x=>x.value);
+    return {p, age:$("age").value, access, place:$("place").value, space:$("space").value, equip, duration:Number($("duration").value), purpose:$("purpose").value, intensity:$("intensity").value};
+  };
+
+  function score(a,r){
+    let s=0, hard=false;
+    if(r.p < a.min || r.p > a.max) { s-=5; hard=true; } else s+=4;
+    if(a.ages.includes(r.age) || a.ages.includes("mixed")) s+=2;
+    else s-=1;
+    if(r.place==="either" || a.places.includes(r.place)) s+=3; else {s-=5; hard=true;}
+    const spaceRank={small:1,medium:2,large:3,any:3};
+    if(r.space==="any" || spaceRank[a.space] <= spaceRank[r.space]) s+=2; else s-=3;
+    if(a.equip.some(e=>r.equip.includes(e))) s+=2;
+    else if(r.equip.includes("none") && a.equip.includes("none")) s+=2;
+    else s-=2;
+    const d=a.duration, target=r.duration;
+    if(target>=d[0] && target<=d[1]+20) s+=3; else if(Math.abs(target-d[0])<=15 || Math.abs(target-d[1])<=15) s+=1; else s-=1;
+    if(a.purpose.includes(r.purpose)) s+=3; else s+=0;
+    if(a.intensity===r.intensity) s+=2; else if((r.intensity==="moderate" && a.intensity!=="high") || (r.intensity==="low" && a.intensity==="moderate")) s+=1;
+    let missing=0;
+    for(const x of r.access) if(!a.access.includes(x)) missing++;
+    if(missing) s-=missing*2; else s+=3;
+    return {s,hard};
+  }
+
+  function label(s){ return s>=14?"Strong match":s>=9?"Good match":s>=5?"Possible with adaptation":"Poor fit"; }
+
+  function render(){
+    const r=read();
+    const ranked=[...activities,...customActivities].map(a=>({...a,...score(a,r)})).sort((a,b)=>b.s-a.s);
+    const usable=ranked.filter(a=>!a.hard && a.s>=5).slice(0,6);
+    $("count").textContent = usable.length ? `${usable.length} suggestions based on your requirements` : "No strong matches — try relaxing a requirement";
+    $("notice").textContent = r.p !== Number($("participants").value) ? "Participant count was adjusted to a usable range (1–500)." : "";
+    if(!usable.length){ $("results").innerHTML='<div class="empty">Try increasing the time available, choosing “Indoor or outdoor”, or selecting fewer constraints.</div>'; return; }
+    $("results").innerHTML=usable.map((a,i)=>{
+      const tags=[`${a.min}–${a.max} people`,a.places.includes(r.place)?r.place:"indoor/outdoor",`${a.duration[0]}–${a.duration[1]} min`,a.intensity+" intensity"];
+      const steps = a.steps || "This activity can be run using the setup and adaptation guidance below.";
+      const photo = a.photo ? `<div class="media"><img src="${escapeHtml(a.photo)}" alt="${escapeHtml(a.name)} demonstration"></div>` : "";
+      const video = a.video ? (a.video.startsWith("blob:") ? `<div class="media"><video controls style="width:100%;max-height:320px;border-radius:10px;background:#111" aria-label="${escapeHtml(a.name)} demonstration video"><source src="${escapeHtml(a.video)}"></video></div>` : `<div class="media"><a class="video-link" href="${escapeHtml(a.video)}" target="_blank" rel="noopener">▶ Watch demonstration video</a></div>`) : "";
+      return `<article class="activity">
+        <div class="activity-top"><div><h3>${escapeHtml(a.name)}</h3></div><div class="score">${label(a.s)}</div></div>
+        <div class="meta">${tags.map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join("")}</div>
+        <p class="reason"><strong>Description:</strong> ${escapeHtml(a.description || a.reason)}</p>
+        <div class="detail"><strong>How to play</strong><div class="steps">${escapeHtml(steps)}</div></div>
+        <div class="adapt"><strong>Accessibility / adaptation</strong>${escapeHtml(a.adapt)}</div>
+        ${photo}${video}
+      </article>`;
+    }).join("");
+  }
+
+  function escapeHtml(v){
+    return String(v ?? "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  $("find").addEventListener("click", render);
+  $("reset").addEventListener("click",()=>{
+    $("participants").value=12; $("age").value="mixed"; $("place").value="either"; $("space").value="any";
+    $("duration").value="20"; $("purpose").value="fun"; $("intensity").value="moderate";
+    document.querySelectorAll(".access,.equip").forEach(x=>x.checked=false);
+    document.querySelector('.equip[value="none"]').checked=true;
+    render();
+  });
+  document.querySelectorAll(".access").forEach(x=>x.addEventListener("change",render));
+  document.querySelectorAll(".equip").forEach(x=>x.addEventListener("change",e=>{
+    if(e.target.value==="none" && e.target.checked) document.querySelectorAll(".equip:not([value=none])").forEach(x=>x.checked=false);
+    if(e.target.value!=="none" && e.target.checked) document.querySelector('.equip[value="none"]').checked=false;
+    render();
+  }));
+  ["participants","age","place","space","duration","purpose","intensity"].forEach(id=>$(id).addEventListener("change",render));
+  $("addActivity").addEventListener("click",()=>{$("modal").style.display="block";$("fName").focus();});
+  $("closeModal").addEventListener("click",()=>{$("modal").style.display="none";});
+  $("modal").addEventListener("click",e=>{if(e.target.id==="modal") $("modal").style.display="none";});
+  $("activityForm").addEventListener("submit",e=>{
+    e.preventDefault();
+    const min=Math.max(1,Number($("fMin").value)||1), max=Math.max(min,Number($("fMax").value)||min);
+    const place=$("fPlace").value;
+    const photoFile=$("fPhotoFile").files[0], videoFile=$("fVideoFile").files[0];
+    const photo = photoFile ? URL.createObjectURL(photoFile) : $("fPhoto").value.trim();
+    const video = videoFile ? URL.createObjectURL(videoFile) : $("fVideo").value.trim();
+    customActivities.push({
+      name:$("fName").value.trim(), description:$("fDesc").value.trim(),
+      steps:$("fSteps").value.trim(), adapt:$("fAdapt").value.trim() || "Add adaptations that match the needs of your group.",
+      photo, video,
+      min,max,ages:["children","teens","adults","mixed"],places:place==="both"?["indoor","outdoor"]:[place],
+      space:"medium",equip:["none"],duration:[10,60],purpose:["fun","icebreaker","team","exercise","calm"],intensity:$("fIntensity").value,
+      access:["mobility","vision","hearing","upper"],reason:$("fDesc").value.trim()
+    });
+    e.target.reset(); $("fMin").value=4; $("fMax").value=20; $("fPlace").value="both"; $("fIntensity").value="moderate";
+    $("modal").style.display="none"; render();
+  });
+
+  render();
+})();
+</script>
+
+<div id="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.42); padding:20px; overflow:auto; z-index:10;">
+  <div style="max-width:720px;margin:20px auto;background:white;border-radius:16px;padding:22px;">
+    <div style="display:flex;justify-content:space-between;gap:12px;align-items:center">
+      <h2 style="margin:0">Add an activity</h2>
+      <button class="secondary" id="closeModal" type="button">Close</button>
+    </div>
+    <p class="sub" style="margin:8px 0 18px">Create a richer activity entry for the recommendation library.</p>
+    <form id="activityForm">
+      <div class="field"><label class="legend">Activity name</label><input id="fName" required placeholder="e.g. Balloon Volleyball"></div>
+      <div class="field"><label class="legend">Short description</label><textarea id="fDesc" required placeholder="What is the activity?"></textarea></div>
+      <div class="field"><label class="legend">How to play</label><textarea id="fSteps" placeholder="1. Set up...&#10;2. Divide the group...&#10;3. Start..."></textarea></div>
+      <div class="field"><label class="legend">Accessibility adaptations</label><textarea id="fAdapt" placeholder="Wheelchair: ...&#10;Visual impairment: ...&#10;Hearing impairment: ..."></textarea></div>
+      <div class="field"><label class="legend">Photo (optional)</label>
+        <input id="fPhoto" type="url" placeholder="Image URL (optional)">
+        <input id="fPhotoFile" type="file" accept="image/*" style="margin-top:8px">
+      </div>
+      <div class="field"><label class="legend">Video (optional)</label>
+        <input id="fVideo" type="url" placeholder="Video URL (YouTube, Vimeo, etc.)">
+        <input id="fVideoFile" type="file" accept="video/*" style="margin-top:8px">
+      </div>
+      <div class="field"><label class="legend">Basic settings</label>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+          <input id="fMin" type="number" min="1" value="4" placeholder="Min participants">
+          <input id="fMax" type="number" min="1" value="20" placeholder="Max participants">
+          <select id="fPlace"><option value="indoor">Indoor</option><option value="outdoor">Outdoor</option><option value="both" selected>Indoor & outdoor</option></select>
+          <select id="fIntensity"><option value="low">Low</option><option value="moderate" selected>Moderate</option><option value="high">High</option></select>
+        </div>
+      </div>
+      <button class="primary" type="submit">Save activity</button>
+    </form>
+  </div>
+</div>
+<style>
+textarea { width:100%; min-height:95px; resize:vertical; padding:11px 12px; border:1px solid var(--border); border-radius:10px; font:inherit; font-size:16px; }
+.media { margin-top:12px; display:grid; gap:10px; }
+.media img { width:100%; max-height:260px; object-fit:cover; border-radius:10px; border:1px solid var(--border); }
+.video-link { display:inline-block; padding:9px 11px; border-radius:9px; background:#eef1f5; color:#273142; text-decoration:none; font-weight:650; }
+.steps { white-space:pre-line; margin:8px 0; }
+.detail { border-top:1px solid var(--border); margin-top:13px; padding-top:13px; }
+</style>
+</body>
+</html>
