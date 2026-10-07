@@ -5,30 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Activity Fit Finder</title>
 <style>
-  ```
-/* Enkel styling av fanemenyen */
-.tab-navigation {
-  display: flex;
-  gap: 10px;
-  border-bottom: 2px solid #e2e8f0;
-  margin-bottom: 20px;
-  padding-bottom: 5px;
-}
-.tab-btn {
-  padding: 8px 16px;
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-size: 15px;
-  color: #64748b;
-  border-bottom: 3px solid transparent;
-}
-.tab-btn.active {
-  font-weight: bold;
-  color: #2563eb;
-  border-bottom-color: #2563eb;
-}
-
   :root { --bg:#f6f7f9; --card:#fff; --text:#18202a; --muted:#667085; --border:#d9dee7; --accent:#3559e0; --good:#16794b; --warn:#a15c00; }
   * { box-sizing:border-box; }
   body { margin:0; font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:var(--bg); color:var(--text); }
@@ -94,12 +70,18 @@
 
       <div class="field">
         <label class="legend">Accessibility considerations</label>
-        <div class="checks">
-          <label class="check"><input type="checkbox" value="mobility" class="access"> Limited mobility / wheelchair user</label>
-          <label class="check"><input type="checkbox" value="vision" class="access"> Visual impairment</label>
-          <label class="check"><input type="checkbox" value="hearing" class="access"> Hearing impairment</label>
-          <label class="check"><input type="checkbox" value="upper" class="access"> Limited upper-body movement</label>
+        <div class="checks" id="accessibilityChecks">
+          <label class="check"><input type="checkbox" value="mobility" class="access"> Mobility</label>
+          <label class="check"><input type="checkbox" value="vision" class="access"> Vision</label>
+          <label class="check"><input type="checkbox" value="hearing" class="access"> Hearing &amp; communication</label>
+          <label class="check"><input type="checkbox" value="cognitive" class="access"> Cognitive &amp; learning</label>
+          <label class="check"><input type="checkbox" value="sensory" class="access"> Sensory</label>
+          <label class="check"><input type="checkbox" value="coordination" class="access"> Coordination &amp; balance</label>
+          <label class="check"><input type="checkbox" value="stamina" class="access"> Stamina / energy</label>
+          <label class="check"><input type="checkbox" value="upperBody" class="access"> Upper-body movement</label>
+          <label class="check"><input type="checkbox" value="other" class="access"> Other</label>
         </div>
+        <div style="margin-top:7px;color:#667085;font-size:0.88rem;">Select any considerations the activity should accommodate. You can select more than one.</div>
       </div>
 
       <div class="field">
@@ -177,16 +159,16 @@
 <script>
 (() => {
   const activities = [
-    {name:"Human Bingo", min:6,max:40,ages:["children","teens","adults","mixed"],places:["indoor","outdoor"],space:"medium",equip:["paper","none"],duration:[15,30],purpose:["icebreaker","fun"],intensity:"low",access:["mobility","vision","hearing","upper"],reason:"Works well for mixed groups, needs little movement and encourages people to interact.",adapt:"Offer seated participation, read prompts aloud, and provide large-print or paired support where useful."},
-    {name:"Story Chain", min:3,max:20,ages:["children","teens","adults","mixed"],places:["indoor","outdoor"],space:"small",equip:["none"],duration:[10,20],purpose:["icebreaker","team","calm"],intensity:"low",access:["mobility","vision","hearing","upper"],reason:"Everyone can contribute from one place, making it easy to scale and adapt.",adapt:"Allow speaking, signing, pointing, writing or assisted communication as appropriate."},
-    {name:"Balloon Volleyball", min:6,max:24,ages:["children","teens","adults","mixed"],places:["indoor","outdoor"],space:"medium",equip:["balls","none"],duration:[15,30],purpose:["fun","team","exercise"],intensity:"moderate",access:["mobility","vision","hearing","upper"],reason:"A light, cooperative movement game that can be played seated or standing.",adapt:"Lower or remove the net, permit seated play, and use an audible or high-contrast ball when needed."},
-    {name:"Target Toss", min:4,max:16,ages:["children","teens","adults","mixed"],places:["indoor","outdoor"],space:"medium",equip:["balls","cones","none"],duration:[15,30],purpose:["fun","exercise"],intensity:"moderate",access:["mobility","hearing","upper"],reason:"Simple turns make participation easy to structure and the target distance can be adjusted.",adapt:"Use seated throwing, roll instead of throw, enlarge targets, or reduce the distance."},
-    {name:"Mirror Movements", min:2,max:20,ages:["children","teens","adults","mixed"],places:["indoor","outdoor"],space:"small",equip:["none"],duration:[5,20],purpose:["fun","icebreaker","calm"],intensity:"low",access:["mobility","vision","hearing","upper"],reason:"Pairs can work within a small area and choose movements that suit their abilities.",adapt:"Use upper-body, facial or finger movements, and demonstrate rather than relying on verbal instructions."},
-    {name:"Team Shape Challenge", min:6,max:30,ages:["children","teens","adults","mixed"],places:["indoor","outdoor"],space:"medium",equip:["none","cones"],duration:[10,30],purpose:["team","fun"],intensity:"moderate",access:["mobility","hearing","upper"],reason:"Teams solve a visual/physical challenge without requiring running.",adapt:"Let participants direct others, form shapes while seated, and use visual instructions."},
-    {name:"Musical Freeze", min:5,max:30,ages:["children","teens","adults","mixed"],places:["indoor","outdoor"],space:"medium",equip:["music","none"],duration:[10,30],purpose:["fun","exercise"],intensity:"moderate",access:["mobility","hearing","upper"],reason:"Flexible movement makes it easy to scale the physical demand.",adapt:"Use visual stop signals for deaf/hard-of-hearing participants and allow seated movement."},
-    {name:"Nature Scavenger Hunt", min:4,max:30,ages:["children","teens","adults","mixed"],places:["outdoor"],space:"large",equip:["paper","none"],duration:[20,60],purpose:["fun","team","exercise"],intensity:"moderate",access:["hearing","upper"],reason:"Can combine exploration with teamwork and observation.",adapt:"Choose an accessible route, provide picture-based lists, and allow stationary observation roles."},
-    {name:"Cooperative Puzzle Relay", min:6,max:24,ages:["children","teens","adults","mixed"],places:["indoor"],space:"medium",equip:["paper","none"],duration:[20,60],purpose:["team","fun"],intensity:"low",access:["mobility","vision","hearing","upper"],reason:"Team members can take different roles, so physical participation is not the only way to contribute.",adapt:"Use tactile or large-print pieces and allow seated team roles."},
-    {name:"Pass the Clap", min:5,max:30,ages:["children","teens","adults","mixed"],places:["indoor","outdoor"],space:"small",equip:["none"],duration:[5,15],purpose:["icebreaker","fun"],intensity:"low",access:["mobility","hearing","upper"],reason:"Very little space or equipment is required and the pace can be adjusted.",adapt:"Replace sound with a visible hand signal or light tap; participants can pass a visual gesture instead."}
+    {name:"Human Bingo", min:6,max:40,ages:["children","teens","adults","mixed"],places:["indoor","outdoor"],space:"medium",equip:["paper","none"],duration:[15,30],purpose:["icebreaker","fun"],intensity:"low",access:["mobility","vision","hearing","cognitive","sensory","coordination","stamina","upperBody","other"],reason:"Works well for mixed groups, needs little movement and encourages people to interact.",adapt:"Offer seated participation, read prompts aloud, and provide large-print or paired support where useful."},
+    {name:"Story Chain", min:3,max:20,ages:["children","teens","adults","mixed"],places:["indoor","outdoor"],space:"small",equip:["none"],duration:[10,20],purpose:["icebreaker","team","calm"],intensity:"low",access:["mobility","vision","hearing","cognitive","sensory","coordination","stamina","upperBody","other"],reason:"Everyone can contribute from one place, making it easy to scale and adapt.",adapt:"Allow speaking, signing, pointing, writing or assisted communication as appropriate."},
+    {name:"Balloon Volleyball", min:6,max:24,ages:["children","teens","adults","mixed"],places:["indoor","outdoor"],space:"medium",equip:["balls","none"],duration:[15,30],purpose:["fun","team","exercise"],intensity:"moderate",access:["mobility","vision","hearing","cognitive","sensory","coordination","stamina","upperBody","other"],reason:"A light, cooperative movement game that can be played seated or standing.",adapt:"Lower or remove the net, permit seated play, and use an audible or high-contrast ball when needed."},
+    {name:"Target Toss", min:4,max:16,ages:["children","teens","adults","mixed"],places:["indoor","outdoor"],space:"medium",equip:["balls","cones","none"],duration:[15,30],purpose:["fun","exercise"],intensity:"moderate",access:["mobility","hearing","upperBody"],reason:"Simple turns make participation easy to structure and the target distance can be adjusted.",adapt:"Use seated throwing, roll instead of throw, enlarge targets, or reduce the distance."},
+    {name:"Mirror Movements", min:2,max:20,ages:["children","teens","adults","mixed"],places:["indoor","outdoor"],space:"small",equip:["none"],duration:[5,20],purpose:["fun","icebreaker","calm"],intensity:"low",access:["mobility","vision","hearing","cognitive","sensory","coordination","stamina","upperBody","other"],reason:"Pairs can work within a small area and choose movements that suit their abilities.",adapt:"Use upper-body, facial or finger movements, and demonstrate rather than relying on verbal instructions."},
+    {name:"Team Shape Challenge", min:6,max:30,ages:["children","teens","adults","mixed"],places:["indoor","outdoor"],space:"medium",equip:["none","cones"],duration:[10,30],purpose:["team","fun"],intensity:"moderate",access:["mobility","hearing","upperBody"],reason:"Teams solve a visual/physical challenge without requiring running.",adapt:"Let participants direct others, form shapes while seated, and use visual instructions."},
+    {name:"Musical Freeze", min:5,max:30,ages:["children","teens","adults","mixed"],places:["indoor","outdoor"],space:"medium",equip:["music","none"],duration:[10,30],purpose:["fun","exercise"],intensity:"moderate",access:["mobility","hearing","upperBody"],reason:"Flexible movement makes it easy to scale the physical demand.",adapt:"Use visual stop signals for deaf/hard-of-hearing participants and allow seated movement."},
+    {name:"Nature Scavenger Hunt", min:4,max:30,ages:["children","teens","adults","mixed"],places:["outdoor"],space:"large",equip:["paper","none"],duration:[20,60],purpose:["fun","team","exercise"],intensity:"moderate",access:["hearing","upperBody"],reason:"Can combine exploration with teamwork and observation.",adapt:"Choose an accessible route, provide picture-based lists, and allow stationary observation roles."},
+    {name:"Cooperative Puzzle Relay", min:6,max:24,ages:["children","teens","adults","mixed"],places:["indoor"],space:"medium",equip:["paper","none"],duration:[20,60],purpose:["team","fun"],intensity:"low",access:["mobility","vision","hearing","cognitive","sensory","coordination","stamina","upperBody","other"],reason:"Team members can take different roles, so physical participation is not the only way to contribute.",adapt:"Use tactile or large-print pieces and allow seated team roles."},
+    {name:"Pass the Clap", min:5,max:30,ages:["children","teens","adults","mixed"],places:["indoor","outdoor"],space:"small",equip:["none"],duration:[5,15],purpose:["icebreaker","fun"],intensity:"low",access:["mobility","hearing","upperBody"],reason:"Very little space or equipment is required and the pace can be adjusted.",adapt:"Replace sound with a visible hand signal or light tap; participants can pass a visual gesture instead."}
   ];
 
 
@@ -293,7 +275,7 @@
       photo, video,
       min,max,ages:["children","teens","adults","mixed"],places:place==="both"?["indoor","outdoor"]:[place],
       space:"medium",equip:["none"],duration:[10,60],purpose:["fun","icebreaker","team","exercise","calm"],intensity:$("fIntensity").value,
-      access:["mobility","vision","hearing","upper"],reason:$("fDesc").value.trim()
+      access:["mobility","vision","hearing","cognitive","sensory","coordination","stamina","upperBody","other"],reason:$("fDesc").value.trim()
     });
     e.target.reset(); $("fMin").value=4; $("fMax").value=20; $("fPlace").value="both"; $("fIntensity").value="moderate";
     $("modal").style.display="none"; render();
@@ -314,7 +296,7 @@
       <div class="field"><label class="legend">Activity name</label><input id="fName" required placeholder="e.g. Balloon Volleyball"></div>
       <div class="field"><label class="legend">Short description</label><textarea id="fDesc" required placeholder="What is the activity?"></textarea></div>
       <div class="field"><label class="legend">How to play</label><textarea id="fSteps" placeholder="1. Set up...&#10;2. Divide the group...&#10;3. Start..."></textarea></div>
-      <div class="field"><label class="legend">Accessibility adaptations</label><textarea id="fAdapt" placeholder="Wheelchair: ...&#10;Visual impairment: ...&#10;Hearing impairment: ..."></textarea></div>
+      <div class="field"><label class="legend">Accessibility adaptations / notes</label><textarea id="fAdapt" placeholder="Wheelchair: ...&#10;Visual impairment: ...&#10;Hearing impairment: ..."></textarea></div>
       <div class="field"><label class="legend">Photo (optional)</label>
         <input id="fPhoto" type="url" placeholder="Image URL (optional)">
         <input id="fPhotoFile" type="file" accept="image/*" style="margin-top:8px">
@@ -343,71 +325,5 @@ textarea { width:100%; min-height:95px; resize:vertical; padding:11px 12px; bord
 .steps { white-space:pre-line; margin:8px 0; }
 .detail { border-top:1px solid var(--border); margin-top:13px; padding-top:13px; }
 </style>
-  <script>
-document.addEventListener("DOMContentLoaded", () => {
-  // 1. Finn eksisterende elementer på siden din
-  const searchSection = document.querySelector(".search-filters");
-  const resultsCard = document.querySelector("#results")?.closest(".card") || document.querySelector(".results")?.parentElement;
-  const libraryCard = document.querySelector("#addActivity")?.closest(".card");
-
-  // Gruppér søkeskjema og resultater som fane 1
-  const searchTabWrapper = document.createElement("div");
-  searchTabWrapper.id = "tab-search";
-  if (searchSection) searchTabWrapper.appendChild(searchSection);
-  if (resultsCard) searchTabWrapper.appendChild(resultsCard);
-  document.body.appendChild(searchTabWrapper);
-
-  // Pakk biblioteket inn som fane 2
-  const libraryTabWrapper = document.createElement("div");
-  libraryTabWrapper.id = "tab-library";
-  libraryTabWrapper.style.display = "none";
-  if (libraryCard) libraryTabWrapper.appendChild(libraryCard);
-  document.body.appendChild(libraryTabWrapper);
-
-  // 2. Opprett den nye kunnskapssiden dynamisk som fane 3
-  const knowledgeTabWrapper = document.createElement("div");
-  knowledgeTabWrapper.id = "tab-knowledge";
-  knowledgeTabWrapper.style.display = "none";
-tabKnowledge.innerHTML = `
-  <div>
-    <h2>Knowledge Base &amp; Resources</h2>
-    <p>Guides, facilitation tips, and inclusion standards.</p>
-    
-    <article>
-      <h3>How to Adapt Physical Games</h3>
-      <p>Your actual text and guidelines go here...</p>
-    </article>
-
-    <article>
-      <h3>Group Size &amp; Timing Tips</h3>
-      <p>More of your guidelines and information here...</p>
-    </article>
-  </div>
-`;
-  document.body.appendChild(knowledgeTabWrapper);
-
-  // 3. Lag og sett inn fanemenyen øverst på siden
-  const nav = document.createElement("nav");
-  nav.className = "tab-navigation";
-  nav.innerHTML = `
-    <button class="tab-btn active" data-target="tab-search">Find activity</button>
-    <button class="tab-btn" data-target="tab-library">Knowledge</button>
-  `;
-  document.body.insertBefore(nav, document.body.firstChild);
-
-  // 4. Legg til klikk-funksjon for å bytte fane
-  nav.querySelectorAll(".tab-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      nav.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-
-      const targetId = btn.getAttribute("data-target");
-      [searchTabWrapper, libraryTabWrapper, knowledgeTabWrapper].forEach(tab => {
-        tab.style.display = tab.id === targetId ? "block" : "none";
-      });
-    });
-  });
-});
-</script>
 </body>
 </html>
