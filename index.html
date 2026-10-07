@@ -130,8 +130,8 @@
   </button>
 </nav>
 
+ <div class="page active" id="finderPage">
   <div class="layout">
-    <div class="page active" id="finderPage">
       
     <section class="card filters" aria-label="Group requirements">
       <h2>Your group</h2>
@@ -331,9 +331,8 @@
 </div>
 
 <script>
-<script>
 (() => {
-  const $ = id => document.getElementById(id);
+
     $("finderTab").addEventListener("click", () => {
     $("finderPage").classList.add("active");
     $("knowledgePage").classList.remove("active");
@@ -517,5 +516,6 @@ textarea { width:100%; min-height:95px; resize:vertical; padding:11px 12px; bord
 .steps { white-space:pre-line; margin:8px 0; }
 .detail { border-top:1px solid var(--border); margin-top:13px; padding-top:13px; }
 </>
+</style>
 </body>
 </html>
