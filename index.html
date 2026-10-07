@@ -368,16 +368,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const knowledgeTabWrapper = document.createElement("div");
   knowledgeTabWrapper.id = "tab-knowledge";
   knowledgeTabWrapper.style.display = "none";
-  knowledgeTabWrapper.innerHTML = `
-    <div class="card">
-      <h2>Kunnskapssider og fagartikler</h2>
-      <p class="sub">Her kan du legge til veiledninger og faglige ressurser.</p>
-      <article style="padding:15px; background:#f8fafc; border-radius:8px; margin-top:10px;">
-        <h3>Veileder for universell utforming</h3>
-        <p>Tips og triks for tilrettelegging av aktiviteter...</p>
-      </article>
-    </div>
-  `;
+tabKnowledge.innerHTML = `
+  <div>
+    <h2>Knowledge Base &amp; Resources</h2>
+    <p>Guides, facilitation tips, and inclusion standards.</p>
+    
+    <article>
+      <h3>How to Adapt Physical Games</h3>
+      <p>Your actual text and guidelines go here...</p>
+    </article>
+
+    <article>
+      <h3>Group Size &amp; Timing Tips</h3>
+      <p>More of your guidelines and information here...</p>
+    </article>
+  </div>
+`;
   document.body.appendChild(knowledgeTabWrapper);
 
   // 3. Lag og sett inn fanemenyen øverst på siden
@@ -385,8 +391,7 @@ document.addEventListener("DOMContentLoaded", () => {
   nav.className = "tab-navigation";
   nav.innerHTML = `
     <button class="tab-btn active" data-target="tab-search">Find activity</button>
-    <button class="tab-btn" data-target="tab-library">Kowledge</button>
-    <button class="tab-btn" data-target="tab-knowledge">K</button>
+    <button class="tab-btn" data-target="tab-library">Knowledge</button>
   `;
   document.body.insertBefore(nav, document.body.firstChild);
 
