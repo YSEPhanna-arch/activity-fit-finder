@@ -42,6 +42,75 @@
   .empty { color:var(--muted); padding:28px 8px; text-align:center; }
   .notice { margin-top:12px; color:var(--warn); font-size:13px; }
   @media(max-width:800px){ .layout{grid-template-columns:1fr;} .filters{position:static;} h1{font-size:27px;} }
+  
+  /* Knowledge page */
+.nav {
+  display:flex;
+  gap:10px;
+  margin:0 0 24px;
+  flex-wrap:wrap;
+}
+
+.nav button {
+  background:#eef1f5;
+  color:#273142;
+}
+
+.nav button.active {
+  background:var(--accent);
+  color:white;
+}
+
+.page {
+  display:none;
+}
+
+.page.active {
+  display:block;
+}
+
+.knowledge-grid {
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0,1fr));
+  gap:16px;
+}
+
+.knowledge-card {
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:18px;
+}
+
+.knowledge-card h3 {
+  margin:0 0 8px;
+  font-size:18px;
+}
+
+.knowledge-card p {
+  color:var(--muted);
+  margin:0 0 14px;
+}
+
+.knowledge-card a {
+  display:inline-block;
+  padding:9px 12px;
+  border-radius:9px;
+  background:#eef1f5;
+  color:#273142;
+  text-decoration:none;
+  font-weight:650;
+}
+
+.knowledge-card a:hover {
+  background:#e2e6ed;
+}
+
+@media(max-width:800px) {
+  .knowledge-grid {
+    grid-template-columns:1fr;
+  }
+}
 </style>
 </head>
 <body>
@@ -51,7 +120,19 @@
     <p class="sub">Describe your group and available resources. The prototype ranks activities by fit and explains useful adaptations.</p>
   </header>
 
+  <nav class="nav" aria-label="Main navigation">
+  <button id="finderTab" class="active" type="button">
+    Activity Finder
+  </button>
+
+  <button id="knowledgeTab" type="button">
+    Knowledge
+  </button>
+</nav>
+
   <div class="layout">
+    <div class="page active" id="finderPage">
+      
     <section class="card filters" aria-label="Group requirements">
       <h2>Your group</h2>
 
@@ -156,8 +237,108 @@
   </div>
 </div>
 
+<div class="page" id="knowledgePage">
+  <div class="card">
+    <h2>Knowledge</h2>
+
+    <p class="sub" style="margin-bottom:20px;">
+      Explore additional resources, guidance and information that can help
+      you understand inclusive physical activity and adapt activities for
+      different groups.
+    </p>
+
+    <div class="knowledge-grid">
+
+      <article class="knowledge-card">
+        <h3>Inclusive Physical Activity</h3>
+        <p>
+          Resources and guidance about making physical activity accessible
+          and inclusive for different participants.
+        </p>
+        <a href="https://www.sportanddev.org/" target="_blank" rel="noopener">
+          Visit resource
+        </a>
+      </article>
+
+      <article class="knowledge-card">
+        <h3>Disability & Sport</h3>
+        <p>
+          Learn more about disability, participation and opportunities in sport
+          and physical activity.
+        </p>
+        <a href="https://www.paralympic.org/" target="_blank" rel="noopener">
+          Visit resource
+        </a>
+      </article>
+
+      <article class="knowledge-card">
+        <h3>Inclusive Coaching</h3>
+        <p>
+          Explore information that can help coaches create more inclusive
+          sessions and activities.
+        </p>
+        <a href="https://www.sportengland.org/" target="_blank" rel="noopener">
+          Visit resource
+        </a>
+      </article>
+
+      <article class="knowledge-card">
+        <h3>Sport & Development</h3>
+        <p>
+          Learn how sport and physical activity can contribute to social
+          development, inclusion and community participation.
+        </p>
+        <a href="https://www.sportanddev.org/" target="_blank" rel="noopener">
+          Visit resource
+        </a>
+      </article>
+
+      <article class="knowledge-card">
+        <h3>Adapted Physical Activity</h3>
+        <p>
+          Resources for adapting physical activities, games and exercises
+          to different abilities and needs.
+        </p>
+        <a href="https://www.ifapa.net/" target="_blank" rel="noopener">
+          Visit resource
+        </a>
+      </article>
+
+      <article class="knowledge-card">
+        <h3>Physical Activity & Health</h3>
+        <p>
+          Learn more about physical activity and its relationship with health
+          and wellbeing.
+        </p>
+        <a href="https://www.who.int/health-topics/physical-activity" target="_blank" rel="noopener">
+          Visit resource
+        </a>
+      </article>
+
+    </div>
+  </div>
+</div>
+
+<script>
 <script>
 (() => {
+  const $ = id => document.getElementById(id);
+    $("finderTab").addEventListener("click", () => {
+    $("finderPage").classList.add("active");
+    $("knowledgePage").classList.remove("active");
+
+    $("finderTab").classList.add("active");
+    $("knowledgeTab").classList.remove("active");
+  });
+
+  $("knowledgeTab").addEventListener("click", () => {
+    $("knowledgePage").classList.add("active");
+    $("finderPage").classList.remove("active");
+
+    $("knowledgeTab").classList.add("active");
+    $("finderTab").classList.remove("active");
+  });
+  
   const activities = [
     {name:"Human Bingo", min:6,max:40,ages:["children","teens","adults","mixed"],places:["indoor","outdoor"],space:"medium",equip:["paper","none"],duration:[15,30],purpose:["icebreaker","fun"],intensity:"low",access:["mobility","vision","hearing","cognitive","sensory","coordination","stamina","upperBody","other"],reason:"Works well for mixed groups, needs little movement and encourages people to interact.",adapt:"Offer seated participation, read prompts aloud, and provide large-print or paired support where useful."},
     {name:"Story Chain", min:3,max:20,ages:["children","teens","adults","mixed"],places:["indoor","outdoor"],space:"small",equip:["none"],duration:[10,20],purpose:["icebreaker","team","calm"],intensity:"low",access:["mobility","vision","hearing","cognitive","sensory","coordination","stamina","upperBody","other"],reason:"Everyone can contribute from one place, making it easy to scale and adapt.",adapt:"Allow speaking, signing, pointing, writing or assisted communication as appropriate."},
@@ -324,6 +505,6 @@ textarea { width:100%; min-height:95px; resize:vertical; padding:11px 12px; bord
 .video-link { display:inline-block; padding:9px 11px; border-radius:9px; background:#eef1f5; color:#273142; text-decoration:none; font-weight:650; }
 .steps { white-space:pre-line; margin:8px 0; }
 .detail { border-top:1px solid var(--border); margin-top:13px; padding-top:13px; }
-</style>
+</>
 </body>
 </html>
